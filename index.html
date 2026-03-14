@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benimle çıkar mısın?</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        overflow: hidden;
+        background: radial-gradient(circle at top, #ffd4e5, #ffc2db 35%, #ffb2d2 60%, #ff9fc8);
+        color: #2b2b2b;
+      }
+
+      .hearts {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+
+      .heart {
+        position: absolute;
+        bottom: -40px;
+        font-size: 20px;
+        animation: floatUp linear infinite;
+        opacity: 0.8;
+      }
+
+      @keyframes floatUp {
+        0% {
+          transform: translateY(0) translateX(0) scale(0.8);
+          opacity: 0;
+        }
+        15% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-120vh) translateX(30px) scale(1.2);
+          opacity: 0;
+        }
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 2;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .card {
+        width: 100%;
+        max-width: 560px;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        border-radius: 32px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        padding: 32px 24px;
+        text-align: center;
+      }
+
+      .badge {
+        display: inline-block;
+        background: #ffe2ed;
+        color: #d43d7b;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 18px;
+      }
+
+      .emoji {
+        font-size: 64px;
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(34px, 6vw, 54px);
+        color: #e33b80;
+        line-height: 1.08;
+      }
+
+      .sub {
+        max-width: 420px;
+        margin: 16px auto 0;
+        color: #666;
+        line-height: 1.7;
+        font-size: 17px;
+      }
+
+      .controls {
+        margin-top: 24px;
+      }
+
+      .music-btn,
+      .yes-btn,
+      .again-btn,
+      .no-btn {
+        border: 0;
+        cursor: pointer;
+        transition: transform 0.2s ease, filter 0.2s ease;
+      }
+
+      .music-btn {
+        background: white;
+        color: #d43d7b;
+        border: 1px solid #ffc5db;
+        border-radius: 999px;
+        padding: 14px 20px;
+        font-size: 15px;
+        font-weight: 700;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      }
+
+      .message {
+        margin-top: 26px;
+        background: #fff0f6;
+        color: #d43d7b;
+        border-radius: 24px;
+        padding: 14px 16px;
+        font-weight: 700;
+        min-height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .yes-area {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .yes-btn {
+        background: #ef4c93;
+        color: white;
+        padding: 18px 34px;
+        border-radius: 22px;
+        font-size: 22px;
+        font-weight: 800;
+        box-shadow: 0 15px 30px rgba(239, 76, 147, 0.35);
+      }
+
+      .yes-btn:hover,
+      .music-btn:hover,
+      .again-btn:hover,
+      .no-btn:hover {
+        filter: brightness(1.05);
+      }
+
+      .no-btn {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #222;
+        color: white;
+        padding: 14px 24px;
+        border-radius: 18px;
+        font-size: 18px;
+        font-weight: 800;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+        z-index: 4;
+      }
+
+      .shake {
+        animation: shake 0.35s linear;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        20% {
+          transform: translate(-4px, 0) rotate(-6deg);
+        }
+        40% {
+          transform: translate(4px, 0) rotate(6deg);
+        }
+        60% {
+          transform: translate(-3px, 0) rotate(-4deg);
+        }
+        80% {
+          transform: translate(3px, 0) rotate(4deg);
+        }
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(83, 12, 48, 0.28);
+        backdrop-filter: blur(6px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 10;
+      }
+
+      .overlay.show {
+        display: flex;
+      }
+
+      .popup {
+        width: 100%;
+        max-width: 460px;
+        background: white;
+        border-radius: 32px;
+        padding: 34px 24px;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .popup-emoji {
+        font-size: 64px;
+      }
+
+      .popup h2 {
+        margin: 14px 0 0;
+        color: #e33b80;
+        font-size: 36px;
+      }
+
+      .popup p {
+        margin-top: 14px;
+        color: #666;
+        line-height: 1.75;
+        font-size: 16px;
+      }
+
+      .again-btn {
+        margin-top: 22px;
+        background: #ef4c93;
+        color: white;
+        padding: 15px 24px;
+        border-radius: 18px;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      .burst-heart {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 30px;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      @keyframes burst {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.2);
+        }
+        15% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .card {
+          padding: 28px 18px;
+        }
+
+        .yes-btn {
+          font-size: 20px;
+          padding: 16px 28px;
+        }
+
+        .no-btn {
+          font-size: 16px;
+          padding: 12px 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hearts" id="hearts"></div>
+
+    <div class="wrap" id="wrap">
+      <div class="card">
+        <div class="badge">Sana özel hazırlanmış soru</div>
+        <img class="emoji" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb2RuNnc0anUweWVoZHFqNXdwNnV2cmNsemVlZG5yaXg4dXIyN2k0YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/pY8jLmZw0ElqvVeRH4/giphy.gif" style="width:140px;margin-bottom:10px;border-radius:14px;" />
+        <h1>Benimle çıkar mısın?</h1>
+        <div class="sub">
+          Dikkatli düşün... çünkü yanlış cevap seçeneği biraz problemli olabilir 😌
+        </div>
+
+        <div class="controls">
+          <button class="music-btn" id="musicBtn">🎵 Müziği Aç</button>
+        </div>
+
+        <div class="message" id="message">Emin misin ya 😔</div>
+
+        <div class="yes-area" id="yesArea">
+          <button class="yes-btn" id="yesBtn">Evet 💖</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="no-btn" id="noBtn">Hayır 🙄</button>
+
+    <div class="overlay" id="overlay">
+      <div class="popup" id="popup">
+        <div class="popup-emoji">💘</div>
+        <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYml0dmxtbWw4bjZncWZ4anNpYmE5M3R0emU3c2hqa2VsZjU0M3VrdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TjSPQgowhhJdHgvnwA/giphy.gif" style="width:100%;max-width:260px;margin:14px auto 0;border-radius:18px;display:block;" />
+        <h2>Yaşasın beee!</h2>
+        <p>
+          Artık resmen dünyanın en tatlı çift adaylarından biri olduk. Bundan sonra geri dönüş yok 😎
+        </p>
+        <button class="again-btn" id="againBtn">Bir daha bak 💫</button>
+      </div>
+    </div>
+
+    <audio id="bgMusic" loop preload="auto">
+      <source src="music.mp3" type="audio/mpeg" />
+    </audio>
+
+    <script>
+      const messages = [
+        'Emin misin ya 😔',
+        'Bir daha düşün bence 🥺',
+        'Bak kalbimi kırıyorsun 💔',
+        'Hayır deme laa 😭',
+        'Bence doğru cevap belli 😌',
+        'Tamam son şansın 😳',
+        'Kaçamazsın artık 😎'
+      ];
+
+      const music = document.getElementById('bgMusic');
+      const musicBtn = document.getElementById('musicBtn');
+      const yesBtn = document.getElementById('yesBtn');
+      const noBtn = document.getElementById('noBtn');
+      const message = document.getElementById('message');
+      const overlay = document.getElementById('overlay');
+      const againBtn = document.getElementById('againBtn');
+      const popup = document.getElementById('popup');
+      const yesArea = document.getElementById('yesArea');
+      const hearts = document.getElementById('hearts');
+
+      let noCount = 0;
+      let musicOn = false;
+      let accepted = false;
+
+      function createFloatingHearts() {
+        for (let i = 0; i < 16; i++) {
+          const heart = document.createElement('div');
+          heart.className = 'heart';
+          heart.textContent = '💖';
+          heart.style.left = Math.random() * 100 + '%';
+          heart.style.fontSize = 16 + Math.random() * 24 + 'px';
+          heart.style.animationDuration = 3 + Math.random() * 4 + 's';
+          heart.style.animationDelay = Math.random() * 2 + 's';
+          hearts.appendChild(heart);
+        }
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function moveNoButtonAroundYes() {
+        const yesRect = yesBtn.getBoundingClientRect();
+        const btnRect = noBtn.getBoundingClientRect();
+
+        const centerX = yesRect.left + yesRect.width / 2;
+        const centerY = yesRect.top + yesRect.height / 2;
+
+        const angle = Math.random() * Math.PI * 2;
+        const radiusX = 110 + Math.random() * 70;
+        const radiusY = 70 + Math.random() * 60;
+
+        let left = centerX + Math.cos(angle) * radiusX - btnRect.width / 2;
+        let top = centerY + Math.sin(angle) * radiusY - btnRect.height / 2;
+
+        left = clamp(left, 10, window.innerWidth - btnRect.width - 10);
+        top = clamp(top, 10, window.innerHeight - btnRect.height - 10);
+
+        noBtn.style.left = left + 'px';
+        noBtn.style.top = top + 'px';
+        noBtn.style.transform = 'translate(0, 0)';
+      }
+
+      function updateNoState() {
+        noCount++;
+        message.textContent = messages[Math.min(noCount, messages.length - 1)];
+
+        const yesScale = Math.min(1 + noCount * 0.18, 2.2);
+        yesBtn.style.transform = `scale(${yesScale})`;
+
+        if (noCount >= 5) {
+          const shrink = Math.max(0.45, 1 - noCount * 0.08);
+          noBtn.style.scale = shrink;
+          noBtn.classList.remove('shake');
+          void noBtn.offsetWidth;
+          noBtn.classList.add('shake');
+        }
+
+        moveNoButtonAroundYes();
+      }
+
+      function maybeRunAway(event) {
+        if (accepted) return;
+        const rect = noBtn.getBoundingClientRect();
+        const x = event.clientX;
+        const y = event.clientY;
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = x - cx;
+        const dy = y - cy;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 120) {
+          updateNoState();
+        }
+      }
+
+      function burstHearts() {
+        for (let i = 0; i < 28; i++) {
+          const heart = document.createElement('div');
+          heart.className = 'burst-heart';
+          heart.textContent = '💖';
+          const angle = Math.random() * Math.PI * 2;
+          const distance = 120 + Math.random() * 180;
+          const x = Math.cos(angle) * distance;
+          const y = Math.sin(angle) * distance;
+
+          heart.style.setProperty('--x', x + 'px');
+          heart.style.setProperty('--y', y + 'px');
+          heart.style.animation = 'burst 1.8s ease-out forwards';
+          heart.animate(
+            [
+              { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0 },
+              { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 1, offset: 0.15 },
+              { transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(1)`, opacity: 0 }
+            ],
+            { duration: 1800, easing: 'ease-out', fill: 'forwards' }
+          );
+
+          popup.appendChild(heart);
+          setTimeout(() => heart.remove(), 1900);
+        }
+      }
+
+      async function toggleMusic() {
+        if (!musicOn) {
+          try {
+            music.volume = 0.35;
+            await music.play();
+            musicOn = true;
+            musicBtn.textContent = '🔇 Müziği Kapat';
+          } catch (e) {}
+        } else {
+          music.pause();
+          musicOn = false;
+          musicBtn.textContent = '🎵 Müziği Aç';
+        }
+      }
+
+      async function acceptLove() {
+        accepted = true;
+        overlay.classList.add('show');
+        message.textContent = 'Biliyordum zaten, dünyanın en doğru kararı verildi 😌💍';
+        noBtn.style.display = 'none';
+        burstHearts();
+
+        try {
+          if (!musicOn) {
+            music.volume = 1;
+            await music.play();
+            musicOn = true;
+            musicBtn.textContent = '🔇 Müziği Kapat';
+          } else {
+            music.volume = 1;
+          }
+        } catch (e) {}
+      }
+
+      function resetSite() {
+        accepted = false;
+        overlay.classList.remove('show');
+        noBtn.style.display = 'block';
+        moveNoButtonAroundYes();
+      }
+
+      musicBtn.addEventListener('click', toggleMusic);
+      yesBtn.addEventListener('click', acceptLove);
+      noBtn.addEventListener('mouseenter', updateNoState);
+      noBtn.addEventListener('click', updateNoState);
+      noBtn.addEventListener('touchstart', updateNoState, { passive: true });
+      document.addEventListener('mousemove', maybeRunAway);
+      againBtn.addEventListener('click', resetSite);
+      window.addEventListener('resize', moveNoButtonAroundYes);
+
+      createFloatingHearts();
+      setTimeout(moveNoButtonAroundYes, 120);
+    </script>
+  </body>
+</html>
